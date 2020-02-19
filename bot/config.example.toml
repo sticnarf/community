@@ -1,0 +1,45 @@
+[database]
+address = "127.0.0.1"
+port = 3306
+username = "root"
+password = ""
+dbname = "cherry_picker"
+
+[slack]
+heartbeat = "admin@pingcap.com"
+token = ""
+mute = true
+hello = false
+
+[github]
+token = ""
+bot = "cherry-picker"
+
+[[repos]]
+owner = "owner"
+repo = "repo"
+interval = 300000
+fullupdate = 86400000
+webhookSecret = "secret"
+rule = "needs-cherry-pick-([0-9.]+)"
+release = "release-[version]"
+typeLabel = "type/[version] cherry-pick"
+ignoreLabel = ".*LGT.*"
+dryrun = true
+cherryPick = false
+cherryPickChannel = "cherry-picker-test"
+runTestCommand = "/run-all-tests"
+
+labelCheck = true
+labelCheckChannel = "label-notice-test"
+defaultChecker = "admin@pingcap.com"
+
+prLimit = true
+maxPrOpened = 3
+prLimitMode = "whitelist"
+prLimitLabel = "S: AutoClose"
+contributorLabel = "T: Contributor ⭐️"
+prLimitOrgs = "pingcap,tikv"
+
+merge = true
+canMergeLabel = "can merge"
