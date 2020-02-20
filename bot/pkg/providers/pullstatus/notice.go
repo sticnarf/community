@@ -99,6 +99,7 @@ func (p *pullStatus) noticeRedPacket(pull *github.PullRequest) error {
 
 func (p *pullStatus) askForReviewer(pull *github.PullRequest) error {
 	reviewerIds := make(map[int64]struct{})
+
 	for _, reviewer := range pull.RequestedReviewers {
 		reviewerIds[*reviewer.ID] = struct{}{}
 	}
@@ -114,6 +115,7 @@ func (p *pullStatus) askForReviewer(pull *github.PullRequest) error {
 	for _, review := range reviews {
 		reviewerIds[*review.User.ID] = struct{}{}
 	}
+	delete(reviewerIds, *pull.User.ID)
 	if len(reviewerIds) >= 2 {
 		return nil
 	}
