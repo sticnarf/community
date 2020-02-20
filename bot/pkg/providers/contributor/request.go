@@ -2,6 +2,7 @@ package contributor
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/go-github/v29/github"
 	"github.com/jinzhu/gorm"
@@ -16,7 +17,10 @@ type ApproveRecord struct {
 	CreatedAt string `gorm:"column:created_at"`
 }
 
-func (c *Contributor) addContributor(pull *github.PullRequest) error {
+func (c *Contributor) addContributorLabel(pull *github.PullRequest) error {
+	if c.cfg.ContributorLabel == "" {
+		return nil
+	}
 	return c.labelPull(pull, c.cfg.ContributorLabel)
 }
 
@@ -51,4 +55,16 @@ func (c *Contributor) isReviewer(login string) (bool, error) {
 		return false, errors.Wrap(err, "query can approve failed")
 	}
 	return true, nil
+}
+
+func (c *Contributor) notifyNewContributorPR(pull *github.PullRequest) error {
+	if !c.cfg.NotifyNewContributorPR {
+		return nil
+	}
+
+	message := fmt.Sprintf("New contributor PR: %s", pull.URL)
+	if err := c.opr.Slack.SendMessage(c.cfg.NoticeChannel, message); err != nil {
+		return errors.Wrap(err, "notify new contributor PR")
+	}
+	return nil
 }

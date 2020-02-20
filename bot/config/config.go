@@ -102,6 +102,8 @@ type RepoConfig struct {
 	IssueSlackNoticeNotify  string
 	// approve
 	PullApprove bool
+	// contributor
+	NotifyNewContributorPR bool
 }
 
 // Database is db connect config
