@@ -195,6 +195,10 @@ func (p *pullStatus) checkEvent(check *PullStatusControl, event string) error {
 		{
 			err = errors.Wrap(p.noticeRedPacket(pull), "check event")
 		}
+	case "AskForReviewer":
+		{
+			err = errors.Wrap(p.askForReviewer(pull), "check event")
+		}
 	}
 
 	return errors.Wrap(err, "check event")

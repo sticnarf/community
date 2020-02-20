@@ -62,7 +62,7 @@ func (c *Contributor) notifyNewContributorPR(pull *github.PullRequest) error {
 		return nil
 	}
 
-	message := fmt.Sprintf("New contributor PR: %s", pull.URL)
+	message := fmt.Sprintf("New contributor PR: %s", pull.HTMLURL)
 	if err := c.opr.Slack.SendMessage(c.cfg.NoticeChannel, message); err != nil {
 		return errors.Wrap(err, "notify new contributor PR")
 	}

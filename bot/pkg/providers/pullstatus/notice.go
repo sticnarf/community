@@ -95,3 +95,14 @@ func (p *pullStatus) noticeRedPacket(pull *github.PullRequest) error {
 	}
 	return nil
 }
+
+func (p *pullStatus) askForReviewer(pull *github.PullRequest) error {
+	if *pull.ReviewComments > 0 || len(pull.RequestedReviewers) > 0 {
+		return nil
+	}
+	message := fmt.Sprintf("PR has no reviewer!\n%s", pull.HTMLURL)
+	if err := p.sendSlackMessage(p.cfg.NoticeChannel, message); err != nil {
+		return errors.Wrap(err, "ask for reviewer")
+	}
+	return nil
+}
