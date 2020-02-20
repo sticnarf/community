@@ -1,6 +1,7 @@
 package pullstatus
 
 import (
+	"context"
 	"fmt"
 	"github.com/google/go-github/v29/github"
 	"github.com/pkg/errors"
@@ -97,10 +98,27 @@ func (p *pullStatus) noticeRedPacket(pull *github.PullRequest) error {
 }
 
 func (p *pullStatus) askForReviewer(pull *github.PullRequest) error {
-	if *pull.ReviewComments > 0 || len(pull.RequestedReviewers) > 0 {
+	reviewerIds := make(map[int64]struct{})
+	for _, reviewer := range pull.RequestedReviewers {
+		reviewerIds[*reviewer.ID] = struct{}{}
+	}
+	if len(reviewerIds) >= 2 {
 		return nil
 	}
-	message := fmt.Sprintf("PR has no reviewer!\n%s", pull.HTMLURL)
+
+	opt := github.ListOptions{}
+	reviews, _, err := p.opr.Github.PullRequests.ListReviews(context.Background(), p.owner, p.repo, pull.GetNumber(), &opt)
+	if err != nil {
+		return err
+	}
+	for _, review := range reviews {
+		reviewerIds[*review.User.ID] = struct{}{}
+	}
+	if len(reviewerIds) >= 2 {
+		return nil
+	}
+
+	message := fmt.Sprintf("PR has no reviewer!\n%s", *pull.HTMLURL)
 	if err := p.sendSlackMessage(p.cfg.NoticeChannel, message); err != nil {
 		return errors.Wrap(err, "ask for reviewer")
 	}
